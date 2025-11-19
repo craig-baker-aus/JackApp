@@ -43,7 +43,6 @@
             <input type="number" id="numberRecurring" placeholder="Total repeats">
         </div>
         <button onclick="addTransaction()">Add Transaction</button>
-        <button onclick="loadTransactions()">Refresh</button>
         <button onclick="clearTransactions()">Clear</button>
    </div>
     

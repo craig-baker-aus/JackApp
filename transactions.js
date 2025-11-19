@@ -2,7 +2,7 @@
         const formData = new FormData();
         formData.append('action', 'init');
         
-        await fetch('income.php', { method: 'POST', body: formData });
+        await fetch('cashflowForecastingAPI.php', { method: 'POST', body: formData });
     }
 
     async function addTransaction() {
@@ -10,7 +10,7 @@
         formData.append('action', 'add');
         formData.append('amount', document.getElementById('amount').value);
         formData.append('description', document.getElementById('description').value);
-        formData.append('date', document.getElementById('transactionDate').value);
+        formData.append('transactionDate', document.getElementById('transactionDate').value);
         formData.append('transactionType', document.getElementById('transactionType').value);
         formData.append('frequency', document.getElementById('frequency').value);
 
@@ -22,21 +22,22 @@
                 formData.append('numberRecurring', document.getElementById('numberRecurring').value);
             }
 
-        await fetch('income.php', { method: 'POST', body: formData });
+        await fetch('cashflowForecastingAPI.php', { method: 'POST', body: formData });
         loadTransactions();
     }
 
     async function clearTransactions() {
         const formData = new FormData();
         formData.append('action', 'clear');
-        await fetch('income.php', { method: 'POST', body: formData });
+        await fetch('cashflowForecastingAPI.php', { method: 'PUT', body: formData });
         loadTransactions();
     }  
     
     async function loadTransactions() {
         const formData = new FormData();
-        formData.append('action', 'get');
-        const response = await fetch('income.php', { method: 'POST', body: formData });
+        formData.append('action', 'transactions');
+        // To provide a specific action, we must use POST here instead of GET.
+        const response = await fetch('cashflowForecastingAPI.php', { method: 'POST', body: formData });
         const transactions = await response.json();
         
         let html = '<h2>Transactions</h2>';
@@ -53,6 +54,6 @@
         const formData = new FormData();
         formData.append('action', 'delete');
         formData.append('id', id);
-        await fetch('income.php', { method: 'POST', body: formData });
+        await fetch('cashflowForecastingAPI.php', { method: 'POST', body: formData });
         loadTransactions();
     }

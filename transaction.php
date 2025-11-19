@@ -11,7 +11,7 @@ class Transaction {
     public $transactionType; // 'income' or 'expense'
     public $frequency; // 'once', 'daily', 'weekly', 'monthly'
     
-    public function __construct($amount, $description, $type, $transDate, $frequency = 'once') {
+    public function __construct($amount, $description, $type, $transDate, $frequency) {
         $this->id = uniqid();
         $this->setAmount($amount);
         $this->setDescription($description);
