@@ -5,7 +5,16 @@ include "transactionDatabase.php";
 
 class CashflowForecastingAPI {
     /*  Provide all operations to manage a single database of cash flow operations.
-        Decodes POST commands (from javaScript fetch) to call the API. */
+        Decodes POST commands (from javaScript fetch) to call the API. 
+        
+        Key Endpoints:
+            POST/income - recordTransaction 
+            POST/expense - recordTransaction
+            GET/transactions - db->getTransactions
+            GET/forecast - db->generateCashFlow
+            GET/balance - db->getBalance
+    */
+            
     private $db;
     
     public function __construct() {
