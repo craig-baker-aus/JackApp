@@ -1,8 +1,10 @@
 <?php
 
 class Transaction {
-    /* Ideally, these should be private thus enforcing the getters and setters, but json_encode
-    only works with public properties. Implementing the JsonSerializable interface would solve the problem. */
+    /*  Implement the core unit to manipulate individual cash trarnsactions in memory. */
+
+    /*  Ideally, these properties should be private thus enforcing the getters and setters, but json_encode
+        only works with public properties. Implementing the JsonSerializable interface would solve the problem. */
 
     private $id;
     public $amount;
@@ -24,11 +26,6 @@ class Transaction {
     public function getId() {
         return $this->id;
     }
-
- /*   public function setId($id) {
-        $this->id = $id;
-        return $this;
-    }*/
 
     // Amount
     public function getAmount() {
@@ -56,6 +53,7 @@ class Transaction {
     }
 
     public function setTransactionDate(DateTime $transactionDate) {
+        /* Process the date as a DateTime, but store it internally as a string, with no time component. */
         $this->transactionDate = $transactionDate->format('Y-m-d');
         return $this;
     }

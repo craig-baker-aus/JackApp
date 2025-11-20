@@ -1,4 +1,8 @@
-    async function initDB() {
+// Callbacks for various buttons and actions in the cash flow forecasting application.
+// Updates the main page with results from operations. Very basic interface for demonstration purposes.
+// Grouped in a single file for organisation and to improve debugging.
+
+async function initDB() {
         const formData = new FormData();
         formData.append('action', 'init');
         
@@ -22,14 +26,11 @@
         let html = '<h2>Projected Cash Flow</h2>';
         html += `<h4>Starting Balance: ${cashFlowInfo.OpeningBalance.finalDate} ${formattedOpeningBalance}</h4>`;
         html += '<h3>Income</h3>';
-        //html += '<div>';
         for (const [date, summary] of Object.entries(cashFlowInfo.Income)) {
             let formattedTotal = formatCurrency(summary.total);
             html += `<div>${date}: ${summary.type} - ${formattedTotal} (Balance: ${formatCurrency(summary.balance)})</div>`;
         }
-       // html += '</div>';
         html += '<h3>Expenses</h3>';
-        //html += '<div>';
         for (const [date, summary] of Object.entries(cashFlowInfo.Expenses)) {
             let formattedTotal = formatCurrency(summary.total);
             html += `<div>${date}: ${summary.type} - ${formattedTotal} (Balance: ${formatCurrency(summary.balance)})</div>`;
@@ -93,7 +94,7 @@
             formData.append('numberRecurring', 1);
         } else {
             if (document.getElementById('numberRecurring').value == "") {
-                formData.append('numberRecurring', 2); // Default to 2 if not specified. Not ideal but provides simple error handling.
+                formData.append('numberRecurring', 2); // Default to 2 if not specified. Not ideal but simplifies error handling.
             } else {
                 formData.append('numberRecurring', document.getElementById('numberRecurring').value);
             }

@@ -1,3 +1,4 @@
+<!-- Simplistic user interface to exercise the cash flow forecasting API. -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,10 +18,10 @@
     
     <div>
         <div class="form-group">
-            <input type="number" id="amount" placeholder="Amount" step="0.01" required value="7">
+            <input type="number" id="amount" placeholder="Amount" step="0.01" required>
         </div>
         <div class="form-group">
-            <input type="text" id="description" placeholder="Description" required value="Desc">
+            <input type="text" id="description" placeholder="Description" required>
         </div>
         <div class="form-group">
             <input type="date" id="transactionDate" required value="<?php echo date('Y-m-d'); ?>">

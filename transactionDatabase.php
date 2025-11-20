@@ -1,6 +1,6 @@
 <?php
 class TransactionDatabase {
-   /* Maintains a list of transactions (class Transaction), sorted by transactionDate (ascending). */
+   /* Maintains a list of transactions (class Transaction) in memory, sorted by transactionDate (ascending). */
 
     private $transactions = [];
 
@@ -17,7 +17,7 @@ class TransactionDatabase {
     }
 
     public function getBalance(string $date) {
-        /* ['finalDate'->String, 'balance'->Float] */
+        /* Returns ['finalDate'->String, 'balance'->Float] */
 
         $balance = $this->initialBalance;
         foreach ($this->transactions as $transaction) {
@@ -34,7 +34,8 @@ class TransactionDatabase {
     }
     
     private function getEndOfMonthDates(DateTime $startDate, DateTime $endDate): array
-{
+    /* Returns an array of DateTime, representing the end of month dates in the provided range. */
+    {
     $endOfMonthDates = [];
     $loopDate = clone $startDate;
 
@@ -78,7 +79,7 @@ class TransactionDatabase {
      private function generateTransactionFlow($type, DateTime $startDate, $reportingDates, float $startingBalance) {
         /*  Generate cash flow of specified type over reporting dates. 
             Returns the end date for each reporting period (currently months) along with the total for that period and the end balance. 
-            Returns "TransactionFlow", i.e array (indexed by date) of ['type'->String, 'total'->Float, 'balance'->Float]*/
+            Physically returns "TransactionFlow", i.e array (indexed by date) of ['type'->String, 'total'->Float, 'balance'->Float]*/
 
         $cashFlow = [];
         $periodStartDate = clone $startDate;
@@ -97,6 +98,7 @@ class TransactionDatabase {
     private function totalTransactions($type, $startDate, $endDate) {
         /*  Calculate total of transactions of specified type between startDate and endDate (inclusive). 
             Returns a "Float". */
+
         $total = 0.00;
         foreach ($this->transactions as $transaction) {
             // The list of transactions is sorted by date, so can optimize the loop.
@@ -116,41 +118,12 @@ class TransactionDatabase {
         return $total;
     }
 
-/*
-    private function generateDepositFlow(DateTime $startDate, $reportingDates) {
-        $cashFlow = [];
-        $periodStartDate = clone $startDate;
-        
-        foreach ($reportingDates as $periodEndDate) {
-            $totalData = $this->totalTransactions('income', $periodStartDate->format('Y-m-d'), $periodEndDate->format('Y-m-d'));
-            $cashFlow[] = [
-                'date' => $periodEndDate,
-                'total' => $totalData,
-                'balance' => $this->getBalance($periodEndDate) // Get balance at end of month
-            ];
-            $periodStartDate->modify('first day of next month');
-        }
-        return $cashFlow;
-    }
-    private function generateWithdrawFlow($period) {
-        $cashFlow = [];
-        
-        foreach ($period as $date) {
-            $totalData = $this->getBalance($date->format('Y-m-t')); // Get balance at end of month
-            $cashFlow[] = [
-                'date' => $date->format('Y-m-t'),
-                'total' => $totalData['total']
-            ];
-        }
-        return $cashFlow;
-    }
-*/
     /* Record income and expense transactions. */
     public function addTransaction(bool $isIndividual, Transaction $transaction, int $numberRecurring) {
         if ($isIndividual || $transaction->getFrequency() == 'once') {
             $this->transactions[$transaction->getId()] = $transaction;
         } else {
-            $this->generateRecurringTransactions($transaction, $numberRecurring);  
+            $this->addRecurringTransactions($transaction, $numberRecurring);  
         }
         // Sort by 'transactionDate' in ascending order
         usort($this->transactions, "self::sortDate");    
@@ -162,11 +135,12 @@ class TransactionDatabase {
     }
     
     public function getTransactionById($id) {
+        /* Not currently used. */
         return $this->transactions[$id] ?? null;
     }
     
     public function deleteTransaction($id) {
-        /* Currently only deletes a single transaction, not recurring series. */
+        /* Currently only deletes a single transaction, not the recurring series. */
         unset($this->transactions[$id]);
     }
     
@@ -174,8 +148,11 @@ class TransactionDatabase {
         $this->transactions = [];
     }
 
-    private function generateRecurringTransactions(Transaction $transaction, $numberRecurring) {
-        //Modified in the loop as needed for the future dates.
+    private function addRecurringTransactions(Transaction $transaction, $numberRecurring) {
+        /*  Adds numberRecurring instances of transaction, on the appropriate dates.
+            transaction specifies the frequency of the transaction. */
+
+        //date is modified in the loop as needed for the future dates.
         $date = new DateTime($transaction->getTransactionDate());
         
         for ($i = 0; $i < $numberRecurring; $i++) {
@@ -188,6 +165,7 @@ class TransactionDatabase {
             );
             $this->addTransaction(true, $newTransaction, 1);
             
+            // Calculate the next date in the series.
             switch($transaction->getFrequency()) {
                 case 'daily': $date->modify('+1 day'); break;
                 case 'weekly': $date->modify('+1 weeks'); break;

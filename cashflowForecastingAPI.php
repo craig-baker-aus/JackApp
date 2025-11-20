@@ -4,6 +4,8 @@ include "transaction.php";
 include "transactionDatabase.php";
 
 class CashflowForecastingAPI {
+    /*  Provide all operations to manage a single database of cash flow operations.
+        Decodes POST commands (from javaScript fetch) to call the API. */
     private $db;
     
     public function __construct() {
@@ -11,7 +13,9 @@ class CashflowForecastingAPI {
     }
     
      public function handleRequest($method, $data) {
-        //header('Content-Type: text/html'); //Do I need this?
+        /*  Central location for interpreting API requests. 
+            Used POST for all of them so the body could be used to further differentiate. */
+
         $action = $data["action"];
         if ($method === 'POST') {
             if ($action === 'add') {
@@ -39,10 +43,10 @@ class CashflowForecastingAPI {
             echo json_encode(['success' => true]);
         }
         $_SESSION['database'] = $this->db;
-        //return ['error' => 'Invalid method'];
     }
         
     private function recordTransaction($data) {
+        /*  Build a Transaction from data and record it in the database. */
 
         /* Redundant for now as front end ensures these fields are present. */
         if (!isset($data['amount']) || !isset($data['description'])) {
@@ -59,12 +63,7 @@ class CashflowForecastingAPI {
         
         $this->db->addTransaction(false, $transaction, $data['numberRecurring']);
         echo json_encode(['success' => true]);
-        //return ['success' => true, 'id' => $id, 'transaction' => $transaction];
     }
-    
-    /*private function getTransactions() {
-        return ['transactions' => array_values($this->db->getAll())];
-    }*/
 }
 
 session_start();
