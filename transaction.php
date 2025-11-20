@@ -25,10 +25,10 @@ class Transaction {
         return $this->id;
     }
 
-    public function setId($id) {
+ /*   public function setId($id) {
         $this->id = $id;
         return $this;
-    }
+    }*/
 
     // Amount
     public function getAmount() {
@@ -55,8 +55,8 @@ class Transaction {
         return $this->transactionDate;
     }
 
-    public function setTransactionDate($transactionDate) {
-        $this->transactionDate = $transactionDate;
+    public function setTransactionDate(DateTime $transactionDate) {
+        $this->transactionDate = $transactionDate->format('Y-m-d');
         return $this;
     }
 

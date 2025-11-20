@@ -38,15 +38,20 @@
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
             </select>
-        </div>
-        <div class="form-group">
             <input type="number" id="numberRecurring" placeholder="Total repeats">
         </div>
         <button onclick="addTransaction()">Add Transaction</button>
-        <button onclick="clearTransactions()">Clear</button>
-   </div>
-    
+        <button onclick="clearTransactions()">Clear Transactions</button>
+        <button onclick="getBalance('<?php echo date('Y-m-d'); ?>')">Current Balance</button>
+        <button onclick="loadTransactions()">Refresh Transactions</button>
+        <div class="form-group">
+            <input type="number" id="numberMonths" placeholder="Months">
+            <button onclick="generateCashFlow()">Generate Cash Flow</button>
+        </div>
+    </div>
+    <div id="balanceDisplay"></div>
     <div class="transaction-list" id="transactionList"></div>
+    <div class="transaction-list" id="cashFlowList"></div>
     
     <script src="transactions.js"></script>
 </body>
