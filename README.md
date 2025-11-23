@@ -15,3 +15,9 @@ and VB.NET. A significant amount of time was also spent switching thought proces
 
 The solution is probably over engineered and I spent significantly more than 2-3 hours. While testing the setup of all the tools, I was using this exercise as my starting point. Initial development was a low priority an therefore slow but it lead to grand ideas which it then made sense to finish off.
 In all I spent approximately 30 hours between Monday 17 November and Thursday 20 November to perform all the above tasks, including documentation.
+
+Update: 24 November.
+
+I had problems with Dates as happens with many languages. It was irritating, so I investigated a better approach.
+The TypeImprovement branch introduces a new PHP type Date and a corresponding JavaScript type PHPDate. I also added some enumerated types.
+The functionality is equivalent to Version 1.
