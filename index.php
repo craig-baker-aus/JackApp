@@ -53,7 +53,7 @@
     <div id="balanceDisplay"></div>
     <div class="transaction-list" id="transactionList"></div>
     <div class="transaction-list" id="cashFlowList"></div>
-    
+
     <script src="transactions.js"></script>
 </body>
 </html>

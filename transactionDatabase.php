@@ -8,7 +8,7 @@ class TransactionDatabase {
         If it has been, the starting balance can be recorded. */
     private $initialBalance = 0.00;
 
-    public function __construct($balance = 0.00) {
+    public function __construct(float $balance = 0.00) {
         $this->initialBalance = $balance;
     }  
 
@@ -33,59 +33,53 @@ class TransactionDatabase {
         return ['finalDate' => $date, 'balance' => $balance];
     }
     
-    private function getEndOfMonthDates(DateTime $startDate, DateTime $endDate): array
+    private function getEndOfMonthDates(Date $startDate, Date $endDate): array
     /* Returns an array of DateTime, representing the end of month dates in the provided range. */
     {
     $endOfMonthDates = [];
-    $loopDate = clone $startDate;
+    $currentMonth = $startDate;
 
     // Loop through each month from the start date to the end date
-    while ($loopDate <= $endDate) {
-        // Clone the current date to avoid modifying the loop variable
-        $currentMonth = clone $loopDate;
-
+    while ($currentMonth <= $endDate) {
         // Modify to the last day of the current month
-        $currentMonth->modify('last day of this month');
+        $currentMonth = $currentMonth->modify('last day of this month');;
 
         // Add the end of month date to the array
         $endOfMonthDates[] = $currentMonth;
 
         // Move to the first day of the next month for the next iteration
-        $loopDate->modify('first day of next month');
+        $currentMonth = $currentMonth->modify('first day of next month');
     }
-
     return $endOfMonthDates;
 }
 
-    public function generateCashFlow($months, $startDate = new DateTime()) {
+    public function generateCashFlow($months, Date $startDate = new Date()) {
         /*  Generate cash flow from startDate for number of months specified.
             startDate defaults to today's date. 
             Returns ['OpeningBalance'-> Float, 'ClosingBalance'-> Float, 'Income'-> TransactionFlow, 'Expenses'-> TransactionFlow] */
 
-        $endDate = clone $startDate;
-        $endDate->modify("+$months months");
+        $endDate = $startDate->modify("+$months months");
         $reportingDates = $this->getEndOfMonthDates($startDate, $endDate);
 
-        $previousDate = clone $startDate;
-        $previousDate->modify("-1 day");
+        $previousDate = $startDate->modify("-1 day");
 
-        $startBalance = $this->getBalance($previousDate->format('Y-m-d'));
+        $startBalance = $this->getBalance($previousDate->__toString());
 
-        $income = $this->generateTransactionFlow("income", $startDate, $reportingDates, $startBalance['balance']);
-        $expense = $this->generateTransactionFlow("expense", $startDate, $reportingDates, $startBalance['balance']);
+        $income = $this->generateTransactionFlow(TransactionType::INCOME, $startDate, $reportingDates, $startBalance['balance']);
+        $expense = $this->generateTransactionFlow(TransactionType::EXPENSE, $startDate, $reportingDates, $startBalance['balance']);
 
-        return ['OpeningBalance' => $startBalance, 'ClosingBalance' => $this->getBalance($endDate->format('Y-m-d')),'Income'=> $income,'Expenses'=> $expense];
+        return ['OpeningBalance' => $startBalance, 'ClosingBalance' => $this->getBalance($endDate->__toString()),'Income'=> $income,'Expenses'=> $expense];
     }
-     private function generateTransactionFlow($type, DateTime $startDate, $reportingDates, float $startingBalance) {
+     private function generateTransactionFlow(TransactionType $type, Date $startDate, $reportingDates, float $startingBalance) {
         /*  Generate cash flow of specified type over reporting dates. 
             Returns the end date for each reporting period (currently months) along with the total for that period and the end balance. 
             Physically returns "TransactionFlow", i.e array (indexed by date) of ['type'->String, 'total'->Float, 'balance'->Float]*/
 
         $cashFlow = [];
-        $periodStartDate = clone $startDate;
+        $periodStartDate = $startDate;
         
         foreach ($reportingDates as $periodEndDate) {
-            $totalAmounts = $this->totalTransactions($type, $periodStartDate->format('Y-m-d'), $periodEndDate->format('Y-m-d'));
+            $totalAmounts = $this->totalTransactions($type, $periodStartDate, $periodEndDate);
             $cashFlow[$periodEndDate->format('Y-m-d')] = [
                 'type' => $type,
                 'total' => $totalAmounts,
@@ -95,7 +89,7 @@ class TransactionDatabase {
         }
         return $cashFlow;
     }
-    private function totalTransactions($type, $startDate, $endDate) {
+    private function totalTransactions($type, Date $startDate, Date $endDate) {
         /*  Calculate total of transactions of specified type between startDate and endDate (inclusive). 
             Returns a "Float". */
 
@@ -120,10 +114,10 @@ class TransactionDatabase {
 
     /* Record income and expense transactions. */
     public function addTransaction(bool $isIndividual, Transaction $transaction, int $numberRecurring) {
-        if ($isIndividual || $transaction->getFrequency() == 'once') {
+        if ($isIndividual || $transaction->getFrequency() === TransactionFrequency::ONCE) {
             $this->transactions[$transaction->getId()] = $transaction;
         } else {
-            $this->addRecurringTransactions($transaction, $numberRecurring);  
+            $this->addRecurringTransactions($transaction, numberRecurring: $numberRecurring);  
         }
         // Sort by 'transactionDate' in ascending order
         usort($this->transactions, "self::sortDate");    
@@ -153,7 +147,7 @@ class TransactionDatabase {
             transaction specifies the frequency of the transaction. */
 
         //date is modified in the loop as needed for the future dates.
-        $date = new DateTime($transaction->getTransactionDate());
+        $date = new Date($transaction->getTransactionDate());
         
         for ($i = 0; $i < $numberRecurring; $i++) {
             $newTransaction = new Transaction(
@@ -167,9 +161,9 @@ class TransactionDatabase {
             
             // Calculate the next date in the series.
             switch($transaction->getFrequency()) {
-                case 'daily': $date->modify('+1 day'); break;
-                case 'weekly': $date->modify('+1 weeks'); break;
-                case 'monthly': $date->modify('+1 months'); break;
+                case TransactionFrequency::DAILY: $date = $date->modify('+1 day'); break;
+                case TransactionFrequency::WEEKLY: $date = $date->modify('+1 weeks'); break;
+                case TransactionFrequency::MONTHLY: $date = $date->modify('+1 months'); break;
                 default: break;
             };
         }

@@ -2,6 +2,7 @@
 
 include "transaction.php";
 include "transactionDatabase.php";
+include "date.php";
 
 class CashflowForecastingAPI {
     /*  Provide all operations to manage a single database of cash flow operations.
@@ -57,17 +58,18 @@ class CashflowForecastingAPI {
     private function recordTransaction($data) {
         /*  Build a Transaction from data and record it in the database. */
 
-        /* Redundant for now as front end ensures these fields are present. */
-        if (!isset($data['amount']) || !isset($data['description'])) {
+        // Redundant for now as front end ensures these fields are present.
+        //NOT WORKING!!!
+        if ($data['amount'] == ""  || $data['description'] == "") {
             return ['error' => 'Missing required fields'];
         }
         
         $transaction = new Transaction(
-            $data['amount'],
+            (float) $data['amount'],
             $data['description'],
-            $data['transactionType'],
-            new DateTime($data['transactionDate']),
-            $data['frequency']
+            TransactionType::from($data['transactionType']),
+            new Date($data['transactionDate']),
+            TransactionFrequency::from($data['frequency'])
         );
         
         $this->db->addTransaction(false, $transaction, $data['numberRecurring']);

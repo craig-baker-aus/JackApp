@@ -2,7 +2,27 @@
 // Updates the main page with results from operations. Very basic interface for demonstration purposes.
 // Grouped in a single file for organisation and to improve debugging.
 
-async function initDB() {
+ //import PHPDate from "./wrappers.js";
+
+   class PHPDate extends Date {
+        // PHPDate does not store time information.
+        // It accepts an input string in the format "YYYY-MM-DD HH:MM:SS" but only uses the date part.
+        // This input string comes from the PHP Date class.
+        constructor(dateString) {
+            // PHP date format is YYYY-MM-DD
+            let datePart = dateString.split(" ")[0];
+            //In JavaScript Date, months are 0-indexed.
+            let [yearNumber, monthNumber, dayNumber] = datePart.split("-");
+            monthNumber -= 1;
+            super(yearNumber, monthNumber, dayNumber);
+        }
+
+        toDateString() {
+            return "" + this.getFullYear() + "-" + (this.getMonth() + 1).toLocaleString('en-au', {minimumIntegerDigits: 2, useGrouping: false}) + "-" + this.getDate().toLocaleString('en-au', {minimumIntegerDigits: 2, useGrouping: false})
+        }
+    }      
+ 
+    async function initDB() {
         const formData = new FormData();
         formData.append('action', 'init');
         
@@ -49,10 +69,14 @@ async function initDB() {
         const transactions = await response.json();
         
         let html = '<h2>Transactions</h2>';
-        for (const [id, trans] of Object.entries(transactions)) {
+         for (const [id, trans] of Object.entries(transactions)) {
             let formattedAmount = formatCurrency(trans.amount);
+            //Get the standard string representation of the current transaction date.
+            //The date will be represented as a Date in PHP so we should use the wrapper type PHPDate here.
+            let formattedDate = new PHPDate(trans.transactionDate.date).toDateString();
+
             html += `<div class="transaction-item">
-                ${trans.transactionType}: ${trans.description} - ${formattedAmount} (${trans.transactionDate}) [${trans.frequency}]
+                ${trans.transType}: ${trans.description} - ${formattedAmount} (${formattedDate}) [${trans.frequency}]
                 <button onclick="deleteTransaction('${id}')">Delete</button>
             </div>`;
         }

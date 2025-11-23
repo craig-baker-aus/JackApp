@@ -1,19 +1,30 @@
 <?php
+    enum TransactionFrequency: string {
+        case ONCE = "once";
+        case DAILY = "daily";
+        case WEEKLY = "weekly";
+        case MONTHLY = "monthly";
+    }
+
+    enum TransactionType: string {
+        case INCOME = "income";
+        case EXPENSE = "expense";
+    }
 
 class Transaction {
-    /*  Implement the core unit to manipulate individual cash trarnsactions in memory. */
-
-    /*  Ideally, these properties should be private thus enforcing the getters and setters, but json_encode
-        only works with public properties. Implementing the JsonSerializable interface would solve the problem. */
+    /*  Implement the core unit to manipulate individual cash transactions in memory. */
 
     private $id;
-    public $amount;
-    public $description;
-    public $transactionDate;
-    public $transactionType; // 'income' or 'expense'
-    public $frequency; // 'once', 'daily', 'weekly', 'monthly'
+     /*  Ideally, these properties should be private thus enforcing the getters and setters, but json_encode
+        only works with public properties. Implementing the JsonSerializable interface would solve the problem. */
+
+   public float $amount;
+    public string $description;
+    public Date $transactionDate;
+    public TransactionType $transType; // 'income' or 'expense'
+    public TransactionFrequency $frequency; // 'once', 'daily', 'weekly', 'monthly'
     
-    public function __construct($amount, $description, $type, $transDate, $frequency) {
+    public function __construct(float $amount, $description, TransactionType $type, Date $transDate, TransactionFrequency $frequency) {
         $this->id = uniqid();
         $this->setAmount($amount);
         $this->setDescription($description);
@@ -32,7 +43,7 @@ class Transaction {
         return $this->amount;
     }
 
-    public function setAmount($amount) {
+    public function setAmount(float $amount) {
         $this->amount = $amount;
         return $this;
     }
@@ -52,19 +63,18 @@ class Transaction {
         return $this->transactionDate;
     }
 
-    public function setTransactionDate(DateTime $transactionDate) {
-        /* Process the date as a DateTime, but store it internally as a string, with no time component. */
-        $this->transactionDate = $transactionDate->format('Y-m-d');
+    public function setTransactionDate(Date $transactionDate) {
+        $this->transactionDate = $transactionDate;
         return $this;
     }
 
     // Transaction Type
     public function getTransactionType() {
-        return $this->transactionType;
+        return $this->transType;
     }
 
-    public function setTransactionType($transactionType) {
-        $this->transactionType = $transactionType;
+    public function setTransactionType(TransactionType $transactionType) {
+        $this->transType = $transactionType;
         return $this;
     }
 
@@ -73,7 +83,7 @@ class Transaction {
         return $this->frequency;
     }
 
-    public function setFrequency($frequency) {
+    public function setFrequency(TransactionFrequency $frequency) {
         $this->frequency = $frequency;
         return $this;
     }
